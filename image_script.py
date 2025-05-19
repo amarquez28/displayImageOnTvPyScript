@@ -6,8 +6,7 @@ import time
 image_folder = "/home/pi-guest-user/share"
 screen_width = 1920
 screen_height = 1080
-delay_range = (5,10) #min and max dely in seconds
-print(pygame.display.list_modes())
+
 
 def load_images(image_folder):
     image_files = [os.path.join(image_folder,f) for f in os.listdir(image_folder) if f.lower().endswith((".png",".jpg",",jpeg",".gif",".bmp"))]
@@ -49,7 +48,7 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 running = False
 
-            delay = random.uniform(*delay_range)
+            delay = 5 #delay in seconds
             #display image on TV 1
             display_images(screenL, image_list[image_pointer_leftTV % num_images])
             time.sleep(delay)
