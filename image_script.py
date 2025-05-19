@@ -8,9 +8,10 @@ screen_width = 1920
 screen_height = 1080
 
 
-def load_images(image_folder):
-    image_files = [os.path.join(image_folder,f) for f in os.listdir(image_folder) if f.lower().endswith((".png",".jpg",",jpeg",".gif",".bmp"))]
-    random.shuffle(image_files)
+def load_images(folder_path):
+    image_files = [os.path.abspath(folder_path) for f in os.listdir(image_folder) if f.lower().endswith((".png",".jpg",",jpeg",".gif",".bmp"))]
+    print("image_files: ", image_files)
+    #random.shuffle(image_files)
     return image_files
 def display_images(screen, image_path):
     try:
