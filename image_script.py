@@ -9,9 +9,7 @@ screen_height = 1080
 
 
 def load_images(folder_path):
-    print("folder_path: ",folder_path)
-    image_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.lower().endswith((".png",".jpg",",jpeg",".gif",".bmp"))]
-    print("image_files: ", image_files)
+    image_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.lower().endswith((".png",".jpg",".jpeg",".gif",".bmp"))]
     #random.shuffle(image_files)
     return image_files
 def display_images(screen, image_path):
@@ -38,7 +36,7 @@ if __name__ == "__main__":
     #if you have dual displays configures on the pi's OS
     #you might need to experiment with display flags and positioning
     screenL = pygame.display.set_mode((screen_width,screen_height), pygame.FULLSCREEN, display = 0)
-    screenR = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN, display=1)
+    screenR = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN, display = 1)
 
     image_pointer_leftTV = 0
     image_pointer_rightTV = 1
@@ -57,7 +55,7 @@ if __name__ == "__main__":
             image_pointer_leftTV += 1
 
             #display image on TV 2
-            display_images(screenR, image_list[image_pointer_leftTV % num_images])
+            display_images(screenR, image_list[image_pointer_rightTV % num_images])
             time.sleep(delay)
             image_pointer_rightTV += 1
 
