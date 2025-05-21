@@ -37,10 +37,11 @@ if __name__ == "__main__":
         print("Error: monitor_id must be 0 or 1.")
         sys.exit(1)
 
-
+    #input for time
     try:
         delay_second = int(sys.argv[2])
     except:
+        print("defaulting to 10 seconds for each image")
         delay_second = 10
 
     pygame.init()
@@ -61,9 +62,9 @@ if __name__ == "__main__":
         pygame.quit()
         sys.exit(1)
 
-    current_image_index = random.randint(0, num_images - 1) # Start randomly for more asynchronicity
-    last_display_time = time.time()
-    next_delay = random.uniform(*delay_second)
+    current_image_index =  0 if monitor_id == 0 else 1
+    # last_display_time = time.time()
+    # next_delay = random.uniform(*delay_second)
 
     running = True
     while running:
@@ -71,12 +72,17 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 running = False
 
+        display_images(current_screen, image_list[current_image_index % num_images])
+        time.sleep(delay_second)
+        current_image_index += 1
+
+        '''
         current_time = time.time()
         if current_time - last_display_time >= next_delay:
             display_images(current_screen, image_list[current_image_index % num_images])
             current_image_index += 1
             last_display_time = current_time
             next_delay = random.uniform(*delay_second) # Get new random delay for next image
-
+        '''
 
     pygame.quit()
