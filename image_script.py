@@ -7,12 +7,11 @@ import sys
 image_folder = "/home/pi-guest-user/share"
 screen_width = 1920
 screen_height = 1080
-delay_range = (2, 7)
 
 
 def load_images(folder_path):
     image_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.lower().endswith((".png",".jpg",".jpeg",".gif",".bmp"))]
-    #random.shuffle(image_files)
+    random.shuffle(image_files)
     return image_files
 def display_images(screen, image_path):
     try:
@@ -38,6 +37,12 @@ if __name__ == "__main__":
         print("Error: monitor_id must be 0 or 1.")
         sys.exit(1)
 
+
+    try:
+        delay_second = int(sys.argv[2])
+    except:
+        delay_second = 10
+
     pygame.init()
 
     image_list = load_images(image_folder)
@@ -58,7 +63,7 @@ if __name__ == "__main__":
 
     current_image_index = random.randint(0, num_images - 1) # Start randomly for more asynchronicity
     last_display_time = time.time()
-    next_delay = random.uniform(*delay_range)
+    next_delay = random.uniform(*delay_second)
 
     running = True
     while running:
@@ -71,7 +76,7 @@ if __name__ == "__main__":
             display_images(current_screen, image_list[current_image_index % num_images])
             current_image_index += 1
             last_display_time = current_time
-            next_delay = random.uniform(*delay_range) # Get new random delay for next image
+            next_delay = random.uniform(*delay_second) # Get new random delay for next image
 
 
     pygame.quit()
