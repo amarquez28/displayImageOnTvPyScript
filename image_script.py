@@ -71,10 +71,6 @@ if __name__ == "__main__":
             print("event: ", event)
             if event.type == pygame.KEYDOWN and event.key == 27:
                 print("pressed ESC")
-            if event.type == pygame.KEYDOWN and event.key == 1073742048:
-                print("pressed LCTRL")
-            if (event.type == pygame.KEYDOWN and event.key == 27) and (event.type == pygame.KEYDOWN and event.key == 1073742048):
-                print("pressed LCTRL and ESCAPE")
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
