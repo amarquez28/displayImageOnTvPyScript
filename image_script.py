@@ -4,7 +4,7 @@ import random
 import time
 import sys
 
-from pygame import K_ESCAPE
+from pygame import K_ESCAPE, K_LCTRL
 
 image_folder = "/home/pi-guest-user/share"
 #these dimensions are for a 1080p monitor
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     running = True
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and (event.key == K_ESCAPE and event.key == K_LCTRL):
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
