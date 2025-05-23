@@ -4,6 +4,8 @@ import random
 import time
 import sys
 
+from pygame import K_ESCAPE
+
 image_folder = "/home/pi-guest-user/share"
 #these dimensions are for a 1080p monitor
 screen_width = 1920
@@ -66,7 +68,7 @@ if __name__ == "__main__":
     running = True
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
+            if event.type == K_ESCAPE:
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
