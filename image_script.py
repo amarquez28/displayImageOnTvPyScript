@@ -31,24 +31,30 @@ if __name__ == "__main__":
     try:
         monitor_id = int(sys.argv[1])
         if monitor_id not in [0, 1]:
-            raise ValueError
-    except ValueError:
-        print("Error: monitor_id must be 0 or 1.")
+            raise ValueError("monitor_id should be 0 or 1.")
+    except ValueError as e:
+        print(f"Error: {e}")
         sys.exit(1)
 
-    #input for time
-    try:
-        delay_second = int(sys.argv[2])
-    except:
-        print("defaulting to 10 seconds for each image")
-        delay_second = 10
+    #default delay
+    delay_seconds = 10
+    if len(sys.argv) > 2:
+        try:
+            user_delay = int(sys.argv[2])
+            if user_delay > 0:
+                delay_seconds = int(user_delay)
+            else:
+                print(f"warning: delay must be a positive integer. Using default {delay_seconds} seconds.")
+        except ValueError:
+            print(f"Error: invalid value for delay '{sys.argv[2]}'. Must be an integer. Using default {delay_seconds} seconds.")
 
     pygame.init()
 
     image_list = load_images(image_folder)
     num_images = len(image_list)
 
-    if num_images < 1:
+    if num_images == 0:
+        #TODO add a default image to display when no images are present
         print("no images to display")
         pygame.quit()
         sys.exit(0)
@@ -61,17 +67,32 @@ if __name__ == "__main__":
         pygame.quit()
         sys.exit(1)
 
-    current_image_index =  0 if monitor_id == 0 else 1
+    current_image_index = 0 if monitor_id == 0 else (1 % num_images) #ensure initial index is valid if num_images is 1
+
+    #timer variables
+    delay_milliseconds = delay_seconds * 1000
+    last_image_update_time = pygame.time.get_ticks() - delay_milliseconds #show first image immediately
+    clock = pygame.time.Clock()#pygame clock  for managing frame rate
+
+    print(f"Starting slideshow on display {monitor_id}. Press ESC to quit.")
+    print(f"Image display delay: {delay_seconds} seconds.")
     running = True
     while running:
         for event in pygame.event.get():
-            print("event: ", event)
-            if event.type == pygame.KEYDOWN and event.key == 27:
+            #print("event: ", event)
+            if event.type == pygame.QUIT: #closes window with 'X' button
                 running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #closes window with Escape
+                running = False
+        current_time = pygame.time.get_ticks()
+        if current_time - last_image_update_time >= delay_milliseconds:
+            if num_images > 0:
+                display_images(current_screen, image_list[current_image_index % num_images])
+                current_image_index += 1
+                last_image_update_time = current_time
 
-        display_images(current_screen, image_list[current_image_index % num_images])
-        time.sleep(delay_second)
-        current_image_index += 1
-        if current_image_index >= 1000:
-            current_image_index = 0
+        #limit the loop to a reasonable frame rate to avoid excessive CPU usage
+        #this also affects how often events are checked 30-60 fps is typical
+        clock.tick(30)
+
     pygame.quit()
