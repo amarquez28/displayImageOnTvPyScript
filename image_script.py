@@ -68,7 +68,7 @@ if __name__ == "__main__":
     running = True
     while running:
         for event in pygame.event.get():
-            if event.type == K_ESCAPE:
+            if event.type == pygame.K_ESCAPE:
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
