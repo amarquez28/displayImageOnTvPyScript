@@ -68,7 +68,9 @@ if __name__ == "__main__":
     running = True
     while running:
         for event in pygame.event.get():
+            print("event: ", event)
             if event.type == pygame.KEYDOWN and (event.key == K_ESCAPE and event.key == K_LCTRL):
+                print("pressed LCTRL and ESCAPE")
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
