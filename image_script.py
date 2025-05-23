@@ -1,10 +1,7 @@
 import pygame
 import os
-import random
 import time
 import sys
-
-from pygame import K_ESCAPE, K_LCTRL
 
 image_folder = "/home/pi-guest-user/share"
 #these dimensions are for a 1080p monitor
@@ -70,7 +67,6 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             print("event: ", event)
             if event.type == pygame.KEYDOWN and event.key == 27:
-                print("pressed ESC")
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
@@ -78,13 +74,4 @@ if __name__ == "__main__":
         current_image_index += 1
         if current_image_index >= 1000:
             current_image_index = 0
-        '''
-        current_time = time.time()
-        if current_time - last_display_time >= next_delay:
-            display_images(current_screen, image_list[current_image_index % num_images])
-            current_image_index += 1
-            last_display_time = current_time
-            next_delay = random.uniform(*delay_second) # Get new random delay for next image
-        '''
-
     pygame.quit()
