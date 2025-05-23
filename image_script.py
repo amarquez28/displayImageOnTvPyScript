@@ -5,13 +5,13 @@ import time
 import sys
 
 image_folder = "/home/pi-guest-user/share"
+#these dimensions are for a 1080p monitor
 screen_width = 1920
 screen_height = 1080
 
 
 def load_images(folder_path):
     image_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.lower().endswith((".png",".jpg",".jpeg",".gif",".bmp"))]
-    random.shuffle(image_files)
     return image_files
 def display_images(screen, image_path):
     try:
@@ -63,19 +63,17 @@ if __name__ == "__main__":
         sys.exit(1)
 
     current_image_index =  0 if monitor_id == 0 else 1
-    # last_display_time = time.time()
-    # next_delay = random.uniform(*delay_second)
-
     running = True
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or event.key == pygame.K_ESCAPE:
                 running = False
 
         display_images(current_screen, image_list[current_image_index % num_images])
         time.sleep(delay_second)
         current_image_index += 1
-
+        if current_image_index >= 1000:
+            current_image_index = 0
         '''
         current_time = time.time()
         if current_time - last_display_time >= next_delay:
