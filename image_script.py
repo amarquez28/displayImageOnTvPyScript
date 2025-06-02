@@ -16,12 +16,31 @@ def load_images(folder_path):
 def display_images(screen, image_path):
     try:
         image = pygame.image.load(image_path)
-        scaled_image = pygame.transform.scale(image, (screen_width, screen_height))
-        screen.blit(scaled_image, (0, 0))
+        original_width = image.get_width()
+        original_height = image.get_height()
+
+        # Calculate the new width to maintain aspect ratio when fitting to screen_height
+        aspect_ratio = original_width / original_height
+        new_height = screen_height
+        new_width = int(new_height * aspect_ratio)
+
+        # If the new width is greater than screen_width (e.g. for very wide images),
+        # then scale to fit screen_width instead, maintaining aspect ratio.
+        if new_width > screen_width:
+            new_width = screen_width
+            new_height = int(new_width / aspect_ratio)
+
+        scaled_image = pygame.transform.smoothscale(image, (new_width, new_height)) # Use smoothscale for better quality
+
+        # Calculate coordinates to center the image
+        pos_x = (screen_width - new_width) // 2
+        pos_y = (screen_height - new_height) // 2 # This will be 0 if fitting to height as primary goal, or if image is taller than screen aspect ratio
+
+        screen.fill((0,0,0)) # Fill screen with black before blitting new image to clear previous one
+        screen.blit(scaled_image, (pos_x, pos_y))
         pygame.display.flip()
     except pygame.error as e:
-        print("error in load display function: ",e)
-
+        print("error in load display function: ", e)
 if __name__ == "__main__":
     #parse command line argument for monitor ID
     if len(sys.argv) < 2:
