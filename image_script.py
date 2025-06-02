@@ -78,10 +78,16 @@ if __name__ == "__main__":
     print(f"Starting slideshow on display {monitor_id}. Press ESC to quit.")
     print(f"Image display delay: {delay_seconds} seconds.")
     running = True
+
     while running:
+        #if number of images changes reload the list
+        #image_list = load_images(image_folder) if len(load_images(image_folder)) != num_images else image_list
+        '''
+        if len(load_images(image_folder)) != num_images:
+            image_list = load_images(image_folder)
+        '''
         for event in pygame.event.get():
-            #print("event: ", event)
-            if event.type == pygame.QUIT: #closes window with 'X' button
+            if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #closes window with Escape
                 running = False
