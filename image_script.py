@@ -81,11 +81,9 @@ if __name__ == "__main__":
 
     while running:
         #if number of images changes reload the list
-        #image_list = load_images(image_folder) if len(load_images(image_folder)) != num_images else image_list
-        '''
         if len(load_images(image_folder)) != num_images:
             image_list = load_images(image_folder)
-        '''
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
