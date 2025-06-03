@@ -5,9 +5,6 @@ import time
 import sys
 
 image_folder = "/home/pi-guest-user/share"
-#these dimensions are for a 1080p monitor
-screen_width = None
-screen_height = None
 
 
 def load_images(folder_path):
@@ -68,8 +65,8 @@ if __name__ == "__main__":
 
     #parse command line argument for monitor ID
     if len(sys.argv) < 2:
-        print("Usage: python3 your_script.py <monitor_id>")
         print("monitor_id should be 0 for left TV or 1 for right TV.")
+        print("Usage: python3 your_script.py <monitor_id>")
         sys.exit(1)
 
     try:
