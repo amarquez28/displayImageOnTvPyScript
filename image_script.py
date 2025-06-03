@@ -6,8 +6,8 @@ import sys
 
 image_folder = "/home/pi-guest-user/share"
 #these dimensions are for a 1080p monitor
-screen_width = 1920
-screen_height = 1080
+screen_width = None
+screen_height = None
 
 
 def load_images(folder_path):
@@ -15,33 +15,57 @@ def load_images(folder_path):
     return image_files
 def display_images(screen, image_path):
     try:
+        # Use module-level screen_width and screen_height.
+        # Add a check in case they weren't set, though the main block should handle this.
+        if screen_width is None or screen_height is None:
+            print("Error: Screen dimensions not properly initialized. Using fallback 1920x1080 for this image.")
+            current_sw, current_sh = 1920, 1080
+        else:
+            current_sw, current_sh = screen_width, screen_height
+
         image = pygame.image.load(image_path)
         original_width = image.get_width()
         original_height = image.get_height()
 
+        if original_height == 0: # Avoid division by zero
+            print(f"Warning: Image {image_path} has zero height. Skipping scaling.")
+            # Optionally display a placeholder or skip
+            return
+
         # Calculate the new width to maintain aspect ratio when fitting to screen_height
         aspect_ratio = original_width / original_height
-        new_height = screen_height
+        new_height = current_sh
         new_width = int(new_height * aspect_ratio)
 
         # If the new width is greater than screen_width (e.g. for very wide images),
         # then scale to fit screen_width instead, maintaining aspect ratio.
-        if new_width > screen_width:
-            new_width = screen_width
-            new_height = int(new_width / aspect_ratio)
+        if new_width > current_sw:
+            new_width = current_sw
+            if aspect_ratio == 0: # Avoid division by zero if original_width was also 0
+                new_height = current_sh # or some other default
+            else:
+                new_height = int(new_width / aspect_ratio)
 
-        scaled_image = pygame.transform.smoothscale(image, (new_width, new_height)) # Use smoothscale for better quality
+        # Ensure dimensions are positive
+        new_width = max(1, new_width)
+        new_height = max(1, new_height)
+
+        scaled_image = pygame.transform.smoothscale(image, (new_width, new_height))
 
         # Calculate coordinates to center the image
-        pos_x = (screen_width - new_width) // 2
-        pos_y = (screen_height - new_height) // 2 # This will be 0 if fitting to height as primary goal, or if image is taller than screen aspect ratio
+        pos_x = (current_sw - new_width) // 2
+        pos_y = (current_sh - new_height) // 2
 
-        screen.fill((0,0,0)) # Fill screen with black before blitting new image to clear previous one
+        screen.fill((0, 0, 0))  # Fill screen with black before blitting new image
         screen.blit(scaled_image, (pos_x, pos_y))
         pygame.display.flip()
     except pygame.error as e:
-        print("error in load display function: ", e)
+        print(f"Error in display_images (Pygame error): {e} for image {image_path}")
+    except Exception as ex:
+        print(f"An unexpected error occurred in display_images: {ex} for image {image_path}")
 if __name__ == "__main__":
+    global screen_width, screen_height
+
     #parse command line argument for monitor ID
     if len(sys.argv) < 2:
         print("Usage: python3 your_script.py <monitor_id>")
@@ -69,6 +93,55 @@ if __name__ == "__main__":
             print(f"Error: invalid value for delay '{sys.argv[2]}'. Must be an integer. Using default {delay_seconds} seconds.")
 
     pygame.init()
+
+    # --- BEGIN: Dynamically set screen_width and screen_height ---
+    try:
+        # Try using pygame.display.get_desktop_sizes() (Pygame 1.9.5+)
+        desktop_sizes = pygame.display.get_desktop_sizes()
+
+        if not desktop_sizes:
+            raise pygame.error("Pygame could not detect any desktop sizes.")
+
+        if monitor_id >= len(desktop_sizes):
+            print(f"Warning: monitor_id {monitor_id} is out of range. Available displays: {len(desktop_sizes)} (0 to {len(desktop_sizes)-1}).")
+            if len(desktop_sizes) > 0:
+                print("Attempting to use primary display (ID 0).")
+                screen_width, screen_height = desktop_sizes[0]
+                monitor_id = 0 # Update monitor_id to reflect actual usage
+            else: # Should not be reached if the 'not desktop_sizes' check above is robust
+                raise pygame.error("No displays found after attempting to use primary display.")
+        else:
+            screen_width, screen_height = desktop_sizes[monitor_id]
+
+        print(f"Using determined resolution for display {monitor_id}: {screen_width}x{screen_height}")
+
+    except AttributeError:
+        # pygame.display.get_desktop_sizes() is not available (older Pygame versions)
+        print("Warning: pygame.display.get_desktop_sizes() not available. Trying alternative method (temporary fullscreen).")
+        try:
+            # This attempts to create a fullscreen window on the target display to get its dimensions.
+            # The 'display' parameter in set_mode must be correctly handled by your Pygame backend (e.g., X11).
+            print(f"Attempting to determine resolution for display {monitor_id} via temporary fullscreen window.")
+            temp_screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN, display=monitor_id)
+            screen_width = temp_screen.get_width()
+            screen_height = temp_screen.get_height()
+            pygame.display.quit()  # Quit this temporary display context
+            pygame.init()        # Re-initialize Pygame as quit() uninitializes modules
+            print(f"Determined resolution for display {monitor_id} via temp fullscreen: {screen_width}x{screen_height}")
+        except pygame.error as e_alt:
+            print(f"Error determining screen size via temporary fullscreen: {e_alt}")
+            print("Falling back to hardcoded 1920x1080.")
+            screen_width, screen_height = 1920, 1080
+    except pygame.error as e:
+        print(f"Pygame error while getting desktop sizes: {e}")
+        print("Falling back to hardcoded 1920x1080.")
+        screen_width, screen_height = 1920, 1080
+
+    # Final fallback if dimensions are still not set (should ideally not happen with above logic)
+    if screen_width is None or screen_height is None:
+        print("Critical Error: Screen dimensions could not be determined. Using default 1920x1080.")
+        screen_width, screen_height = 1920, 1080
+    # --- END: Dynamically set screen_width and screen_height ---
 
     image_list = load_images(image_folder)
     num_images = len(image_list)
