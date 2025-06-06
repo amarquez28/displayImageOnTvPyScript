@@ -66,7 +66,6 @@ if __name__ == "__main__":
     #parse command line argument for monitor ID
     if len(sys.argv) < 2:
         print("monitor_id should be 0 for left TV or 1 for right TV.")
-        print("Usage: python3 your_script.py <monitor_id>")
         sys.exit(1)
 
     try:
@@ -150,6 +149,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     try:
+        window_title = f"Image Slideshow Monitor {monitor_id}"
+        pygame.display.set_caption(window_title)
+        
         current_screen = pygame.display.set_mode((screen_width,screen_height),pygame.FULLSCREEN, display=monitor_id)
     except pygame.error as e:
         print(f"Error initializing display {monitor_id}: {e}")
@@ -165,8 +167,6 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()#pygame clock  for managing frame rate
 
     print(f"Image Slideshow Monitor {monitor_id}")
-    print("Press ESC to quit.")
-    print(f"Image display delay: {delay_seconds} seconds.")
     running = True
 
     while running:
