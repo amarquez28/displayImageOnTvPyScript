@@ -164,7 +164,8 @@ if __name__ == "__main__":
     last_image_update_time = pygame.time.get_ticks() - delay_milliseconds #show first image immediately
     clock = pygame.time.Clock()#pygame clock  for managing frame rate
 
-    print(f"Starting slideshow on display {monitor_id}. Press ESC to quit.")
+    print(f"Image Slideshow Monitor {monitor_id}")
+    print("Press ESC to quit.")
     print(f"Image display delay: {delay_seconds} seconds.")
     running = True
 
