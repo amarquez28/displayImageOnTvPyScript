@@ -8,7 +8,7 @@ image_folder = "/home/pi-guest-user/share"
 
 
 def load_images(folder_path):
-    image_files = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if f.lower().endswith((".png",".jpg",".jpeg",".gif",".bmp"))]
+    image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if not f.startswith('.') and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp"))]
     return image_files
 def display_images(screen, image_path):
     try:

@@ -1,4 +1,5 @@
 #this works for two 1920x1080 displays that are side by side to each other
+#this script lives on the pi located at /home/pi-gues-user/bash_script/slideshow.sh
 #!/bin/bash
 
 export DISPLAY=:0
