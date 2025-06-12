@@ -167,6 +167,7 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()#pygame clock  for managing frame rate
 
     print(f"Image Slideshow Monitor {monitor_id}")
+    pygame.mouse.set_visible(False)
     running = True
 
     while running:
