@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import pygame
 import os
-import time
 import sys
 
 image_folder = "/home/pi-guest-user/share"
@@ -118,7 +117,7 @@ if __name__ == "__main__":
             # This attempts to create a fullscreen window on the target display to get its dimensions.
             # The 'display' parameter in set_mode must be correctly handled by your Pygame backend (e.g., X11).
             print(f"Attempting to determine resolution for display {monitor_id} via temporary fullscreen window.")
-            temp_screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN, display=monitor_id)
+            temp_screen = pygame.display.set_mode((0,0), pygame.NOFRAME, display=monitor_id)
             screen_width = temp_screen.get_width()
             screen_height = temp_screen.get_height()
             pygame.display.quit()  # Quit this temporary display context
@@ -152,7 +151,7 @@ if __name__ == "__main__":
         window_title = f"Image Slideshow Monitor {monitor_id}"
         pygame.display.set_caption(window_title)
         
-        current_screen = pygame.display.set_mode((screen_width,screen_height),pygame.FULLSCREEN, display=monitor_id)
+        current_screen = pygame.display.set_mode((screen_width,screen_height),pygame.NOFRAME, display=monitor_id)
     except pygame.error as e:
         print(f"Error initializing display {monitor_id}: {e}")
         print("Make sure your Raspberry Pi's OS is configured for dual displays and that the 'display' argument matches an available X11 display.")
