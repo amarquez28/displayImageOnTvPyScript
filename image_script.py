@@ -178,9 +178,9 @@ if __name__ == "__main__":
     running = True
 
     while running:
-        while num_images == 0:
+        if len(load_images(image_folder)) == 0:
             display_default_image(default_image_folder)
-            num_images = len(load_images(image_folder))
+            num_images = 0
         
         #if number of images changes reload the list
         if len(load_images(image_folder)) != num_images:
