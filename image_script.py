@@ -4,11 +4,24 @@ import os
 import sys
 
 image_folder = "/home/pi-guest-user/share"
+default_image_folder = "/home/pi-guest-user/default"
+def display_default_image(path):
+    try:
+        current_sw, current_sh = 1920, 1080
 
+        image = pygame.image.load(path)
+
+        pygame.display.flip()
+
+    except pygame.error as e:
+        print(f"Error in display_default_image (Pygame error): {e} for image {path}")
+    except Exception as ex:
+        print(f"An unexpected error occurred in display_default_image: {ex} for image {path}")
 
 def load_images(folder_path):
     image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if not f.startswith('.') and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp"))]
     return image_files
+
 def display_images(screen, image_path):
     try:
         # Use module-level screen_width and screen_height.
@@ -141,12 +154,6 @@ if __name__ == "__main__":
     image_list = load_images(image_folder)
     num_images = len(image_list)
 
-    if num_images == 0:
-        #TODO add a default image to display when no images are present
-        print("no images to display")
-        pygame.quit()
-        sys.exit(0)
-
     try:
         window_title = f"Image Slideshow Monitor {monitor_id}"
         pygame.display.set_caption(window_title)
@@ -158,7 +165,8 @@ if __name__ == "__main__":
         pygame.quit()
         sys.exit(1)
 
-    current_image_index = 0 if monitor_id == 0 else (1 % num_images) #ensure initial index is valid if num_images is 1
+    if num_images > 0:
+        current_image_index = 0 if monitor_id == 0 else (1 % num_images) #ensure initial index is valid if num_images is 1
 
     #timer variables
     delay_milliseconds = delay_seconds * 1000
@@ -170,6 +178,10 @@ if __name__ == "__main__":
     running = True
 
     while running:
+        while num_images == 0:
+            display_default_image(default_image_folder)
+            num_images = len(load_images(image_folder))
+        
         #if number of images changes reload the list
         if len(load_images(image_folder)) != num_images:
             image_list = load_images(image_folder)
