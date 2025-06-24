@@ -4,19 +4,42 @@ import os
 import sys
 
 image_folder = "/home/pi-guest-user/share"
-default_image_folder = "/home/pi-guest-user/default"
-def display_default_image(path):
+default_image = "/home/pi-guest-user/default/Default.png"
+def display_default_image(screen, path):
     try:
-        current_sw, current_sh = 1920, 1080
+        if not os.path.exists(path):
+            print(f"Error image not found in path {path}")
+            screen.fill((20,20,20))
+            pygame.display.flip()
+            return
+        
+        current_sw, current_sh = screen_width, screen_height
 
         image = pygame.image.load(path)
+        original_width, original_height = image.get_width(), image.get_height()
 
+        if original_height == 0: return
+
+        aspect_ratio = original_width / original_height
+        new_height = current_sh
+        new_width = int(new_height * aspect_ratio)
+
+        if new_width > current_sw:
+            new_width = current_sw
+            new_height = int(new_width / aspect_ratio)
+
+        new_width, new_height = max(1, new_width), max(1,new_height)
+
+        scaled_image = pygame.transform.smoothscale(image, (new_width, new_height))
+        pos_x = (current_sw - new_width) // 2
+        pos_y = (current_sh - new_height) // 2
+
+        screen.fill((0,0,0))
+        screen.blit(scaled_image, (pos_x, pos_y))
         pygame.display.flip()
 
-    except pygame.error as e:
-        print(f"Error in display_default_image (Pygame error): {e} for image {path}")
-    except Exception as ex:
-        print(f"An unexpected error occurred in display_default_image: {ex} for image {path}")
+    except Exception as e:
+        print(f"An error occured in display_default_image function: {e}")
 
 def load_images(folder_path):
     image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if not f.startswith('.') and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp"))]
@@ -178,26 +201,29 @@ if __name__ == "__main__":
     running = True
 
     while running:
-        if len(load_images(image_folder)) == 0:
-            display_default_image(default_image_folder)
-            num_images = 0
-        
-        #if number of images changes reload the list
-        if len(load_images(image_folder)) != num_images:
-            image_list = load_images(image_folder)
+        image_list = load_images(image_folder)
+        num_images = len(image_list)
+
+
+        if num_images > 0 and current_image_index == 0:
+            current_image_index = 0 if monitor_id == 0 else (1 % num_images)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #closes window with Escape
                 running = False
+
+
         current_time = pygame.time.get_ticks()
         if current_time - last_image_update_time >= delay_milliseconds:
             if num_images > 0:
                 display_images(current_screen, image_list[current_image_index % num_images])
                 current_image_index += 1
-                last_image_update_time = current_time
+            else:
+                display_default_image(current_screen, default_image)
 
+            last_image_update_time = current_time
         #limit the loop to a reasonable frame rate to avoid excessive CPU usage
         #this also affects how often events are checked 30-60 fps is typical
         clock.tick(30)
