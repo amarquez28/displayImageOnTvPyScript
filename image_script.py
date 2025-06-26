@@ -221,9 +221,10 @@ if __name__ == "__main__":
 
             if is_showing_default:
                 print("images found starting slideshow")
-                current_image_index = 0 if monitor_id == 0 else (1 % num_images)
                 is_showing_default = False
-
+            if num_images > 1:
+                current_image_index = 0 if monitor_id == 0 else (1 % num_images)
+            
             display_images(current_screen, image_list[current_image_index % num_images])
             current_image_index += 1
         else:
