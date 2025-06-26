@@ -201,6 +201,7 @@ if __name__ == "__main__":
     is_showing_default = True
     pygame.mouse.set_visible(False)
     running = True
+    checked = False
 
     while running:
         for event in pygame.event.get():
@@ -222,9 +223,10 @@ if __name__ == "__main__":
             if is_showing_default:
                 print("images found starting slideshow")
                 is_showing_default = False
-            if num_images > 1:
                 current_image_index = 0 if monitor_id == 0 else (1 % num_images)
-            
+            if num_images > 1 and  not checked:
+                current_image_index = 0 if monitor_id == 0 else (1 % num_images)
+                checked = True
             display_images(current_screen, image_list[current_image_index % num_images])
             current_image_index += 1
         else:
