@@ -42,7 +42,7 @@ def display_default_image(screen, path):
         print(f"An error occured in display_default_image function: {e}")
 
 def load_images(folder_path):
-    image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if not f.startswith('.') and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp",".pdf"))]
+    image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if not f.startswith('.') and f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp"))]
     return image_files
 
 def display_images(screen, image_path):
@@ -191,39 +191,49 @@ if __name__ == "__main__":
     if num_images > 0:
         current_image_index = 0 if monitor_id == 0 else (1 % num_images) #ensure initial index is valid if num_images is 1
 
+#---------Main Loop Setup ------- #
+    current_image_index = 0
     #timer variables
     delay_milliseconds = delay_seconds * 1000
     last_image_update_time = pygame.time.get_ticks() - delay_milliseconds #show first image immediately
     clock = pygame.time.Clock()#pygame clock  for managing frame rate
 
-    print(f"Image Slideshow Monitor {monitor_id}")
+    is_showing_default = True
     pygame.mouse.set_visible(False)
     running = True
 
     while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                running = False
+
+        current_time = pygame.time.get_ticks()
+        if current_time - last_image_update_time < delay_milliseconds:
+            clock.tick(30)#keep ticking
+            continue #skip to next loop iteration until its time to update
+
+        #check for update
         image_list = load_images(image_folder)
         num_images = len(image_list)
 
 
-        if num_images > 0 and current_image_index == 0:
-            current_image_index = 0 if monitor_id == 0 else (1 % num_images)
+        if num_images > 0: #if we are shoing the default we need to setup the slideshow
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #closes window with Escape
-                running = False
+            if is_showing_default:
+                print("images found starting slideshow")
+                current_image_index = 0 if monitor_id == 0 else (1 % num_images)
+                is_showing_default = False
 
+            display_images(current_screen, image_list[current_image_index % num_images])
+            current_image_index += 1
+        else:
+            if not is_showing_default:
+                print("no images, displaying default")
+                is_showing_default = True
 
-        current_time = pygame.time.get_ticks()
-        if current_time - last_image_update_time >= delay_milliseconds:
-            if num_images > 0:
-                display_images(current_screen, image_list[current_image_index % num_images])
-                current_image_index += 1
-            else:
-                display_default_image(current_screen, default_image)
+            display_default_image(current_screen, default_image)
 
-            last_image_update_time = current_time
+        last_image_update_time = current_time
         #limit the loop to a reasonable frame rate to avoid excessive CPU usage
         #this also affects how often events are checked 30-60 fps is typical
         clock.tick(30)
