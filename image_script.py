@@ -233,6 +233,7 @@ if __name__ == "__main__":
             if not is_showing_default:
                 print("no images, displaying default")
                 is_showing_default = True
+                checked = False
 
             display_default_image(current_screen, default_image)
 
